@@ -109,4 +109,4 @@ Los avisos (nueva alerta, alerta confirmada, nuevo reporte) aparecen abajo a la 
 - [x] Paso 4 · IA de fotos (el lirio con IA ya viene en los datos del paso 1)
 - [x] Paso 5 · Bot de Telegram
 - [x] Paso 6 · Tablero
-- [x] Paso 7 · Integración y ensayo (ver `GUION.md`)
+- [x] Paso 7 · Integración y ensayo
