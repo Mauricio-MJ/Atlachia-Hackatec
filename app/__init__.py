@@ -1,0 +1,1 @@
+"""Atlachia: aplicación principal."""

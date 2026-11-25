@@ -1,0 +1,48 @@
+# Atlachia · servicios en Docker
+# Los valores (${...}) salen del archivo .env que crea instalar.bat
+name: atlachia
+
+services:
+  db:
+    image: postgis/postgis:16-3.4          # PostgreSQL 16 + PostGIS 3.4
+    container_name: atlachia_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USUARIO}
+      POSTGRES_PASSWORD: ${DB_CLAVE}
+      POSTGRES_DB: ${DB_NOMBRE}
+    ports:
+      - "127.0.0.1:${DB_PUERTO}:5432"      # solo accesible desde esta computadora
+    volumes:
+      - atlachia_datos:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USUARIO} -d ${DB_NOMBRE}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  sensores:
+    build: ./sensores                      # compila los simuladores C++ dentro del contenedor
+    container_name: atlachia_sensores
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${DB_USUARIO}:${DB_CLAVE}@db:5432/${DB_NOMBRE}
+      INTERVALO_S: "3"                     # segundos entre lecturas (en campo: 300)
+    depends_on:
+      db:
+        condition: service_healthy
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: atlachia_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_CLAVE}
+    ports:
+      - "127.0.0.1:5051:80"
+    depends_on:
+      - db
+
+volumes:
+  atlachia_datos:
